@@ -1,6 +1,6 @@
 # Consensify
 
-DOCUMENTATION FOR Consensify v0.1
+Documentation for Consensify v0.1
 
 Axel Barlow and Johanna L. A. Paijmans, December 2018
 
