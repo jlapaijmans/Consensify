@@ -2,6 +2,8 @@
 
 Documentation for Consensify v0.1
 
+*The manuscript accompanying this source is expected to be made available on BioRxiv by 14th Dec at the latest*
+
 Axel Barlow and Johanna L. A. Paijmans, December 2018
 
 emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
