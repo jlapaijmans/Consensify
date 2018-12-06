@@ -10,7 +10,7 @@ This is really up to you, based on the properties of your data and specific rese
 
 ## HOW DO I DECIDE THE MAXIMUM ACCEPTABLE DEPTH?
 
-This also also ultimately your decision, but we generally do use a max depth filter since regions with extremely high coverage may represent repetitive elements that the map qualtiy filter failed to mitigate. Typically we use the upper 95th percentile of coverage as a cut off. You can calculate depth in angsd like this:
+This also also ultimately your decision, but we generally do use a max depth filter since regions with extremely high coverage may represent repetitive elements that the map quality filter failed to mitigate. Typically we use the upper 95th percentile of coverage as a cut off. You can calculate depth in angsd like this:
 
 angsd -bam bamlist.txt -doCounts 1 -doDepth 1 -maxDepth 200 -minQ 30 -minMapQ 30 -rf scaffolds_over_1MB.txt -out out
 
