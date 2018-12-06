@@ -20,11 +20,13 @@ Note this should be run using the same filters applied for the base calls, so th
 
 There are many options, but we use Dr. James Cahill's excellent scripts written in C++ (https://github.com/jacahill/Admixture). Download and install the scripts, and you can run the Dstat like this:
 
-`Dstat P1.fa P2.fa P3.fa P4.fa 5000000 > P1_P2_P3_P4.dstat`
+    Dstat P1.fa P2.fa P3.fa P4.fa 5000000 > P1_P2_P3_P4.dstat
 
 Where the first 4 arguments are the Consensify files to be used for the test. The 5th argument is the blocksize for weighted block jackknife. You can direct the output to a file with >. You can process the output with James' python scripts:
 
-`python D-stat_parser.py P1_P2_P3_out.dstat` - gives you D and the ABBA BABA counts
+    python D-stat_parser.py P1_P2_P3_out.dstat
+
+gives you D and the ABBA BABA counts
 
 `python weighted_block_jackknife.py P1_P2_P3_out.dstat 5000000` - gives you the standard error. Enter the block size after the input filename. D/SE give you the Z-score
 
