@@ -37,7 +37,7 @@ The .lengths file has to be created by the user. See the example scaffold_length
 
 
 ## Running Consensify
-Consensify is a perl script which should run on any UNIX system. Windows is untested and unsupported, but may be possible. We have tested it on *Scientific Linux v6* and *Ubuntu* versions 14.04 and 16.04. 
+Consensify is a perl script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** versions 14.04 and 16.04. 
 
 To run Consensify, cd to the directory containing the script and enter:
 
