@@ -12,7 +12,7 @@ This is really up to you, based on the properties of your data and specific rese
 
 This also also ultimately your decision, but we generally do use a max depth filter since regions with extremely high coverage may represent repetitive elements that the map quality filter failed to mitigate. Typically we use the upper 95th percentile of coverage as a cut off. You can calculate depth in angsd like this:
 
- `angsd -bam bamlist.txt -doCounts 1 -doDepth 1 -maxDepth 200 -minQ 30 -minMapQ 30 -rf scaffolds_over_1MB.txt -out out`
+    angsd -bam bamlist.txt -doCounts 1 -doDepth 1 -maxDepth 200 -minQ 30 -minMapQ 30 -rf scaffolds_over_1MB.txt -out out
 
 Note this should be run using the same filters applied for the base calls, so the coverage calculation is representative. bamlist.txt should be a list of the bam files you want to analyse. The -rf option allows you to exclude small scaffolds. See angsd documentation for full details. Several files are produced as output. One will be the individual coverage for each bam, from which you can determine the 95th percentile
 
@@ -67,3 +67,7 @@ root the tree, this assumes the outgroup is the first sequence in the alignment
 
 plot the tree
 `plot(rtree, main="NJ tree using Consensify")`
+
+## References
+
+* Korneliussen TS, Albrechtsen A, Nielsen R (2014) ANGSD : Analysis of Next Generation Sequencing Data. BMC Bioinformatics 15: 356.
