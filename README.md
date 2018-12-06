@@ -21,11 +21,11 @@ Consensify is a method for generating a consensus pseudohaploid genome sequence 
 ## Input data
 Consensify takes 3 files as input. Small example files are included with the Consensify distribution, in the “examples” directory:
 
-eg.counts – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
+`examples/eg.counts` – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
 
-eg.pos – a file containing a 3 column table: scaffold name, position, read depth
+`examples/eg.pos` – a file containing a 3 column table: scaffold name, position, read depth
 
-scaffold_lengths.txt – file containing a 2 column table: scaffold name, length
+`examples/scaffold_lengths.txt` – file containing a 2 column table: scaffold name, length
 
 The .counts and .pos files can be generated from a standard bam file using the -doCounts function in angsd (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
 
