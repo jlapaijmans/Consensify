@@ -45,7 +45,7 @@ To run Consensify, cd to the directory containing the script and enter:
 
 This should return the following error message, which describes the 5 arguments required to run Consensify:
 
-ERROR: script needs five arguments, in this order:
+    ERROR: script needs five arguments, in this order:
     name (and location) of .pos file
     name (and location) of .counts file
     name (and location) of sequence IDs and lengths
