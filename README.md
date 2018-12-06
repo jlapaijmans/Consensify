@@ -10,8 +10,7 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 ## Introduction
 Consensify is a method for generating a consensus pseudohaploid genome sequence with greatly reduced error rates compared to standard pseudohaploidisation. The method is described in full and tested in the associated publication (Barlow et al. 2018). Briefly, for each position of the reference genome, three bases are selected from the read stack at random. If two or three out of three reads agree, then that base is retained. If only two reads are present, but they agree, then that base is also retained. In either case, if no two reads agree, then an N is entered for that position. If coverage is < 2, or above a maximum depth specified by the user, then an N is entered for that position. An example is shown below. The table summarises a read stack by the number of bases observed in columns (totA, totC, totG, totT) at each position of the reference genome (represented by sequential rows). The Consensify sequence for this read stack would be TGNAC.
 
-totA	totC	totG	totT
-
+>totA	totC	totG	totT
 0	0	1	2
 0	0	2	0
 1	0	0	1
