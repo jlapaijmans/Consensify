@@ -44,7 +44,7 @@ $3 is the output filename.
 
 We often use the ape package in R to generate a distance matrix from the alignment under some model of nucleotide substitution, which can be used for principal coordinates analysis or neighbour-joining phylogenetic analysis. This can be done like this:
 
-R
+## How do I make figures in R?
 
 ### Load ape library. Do install.packages("ape") if not already installed
 library(ape)
