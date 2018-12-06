@@ -96,6 +96,6 @@ Finally if you like Consensify, if you need help, or if you have ideas on how Co
 
 
 ## References
-Barlow A, Hartmann S, Gonzales J, Hofreiter M, Paijmans JLA (2018) Consensify: a method for generating pseudohaploid genome sequences from palaeogenomic datasets with reduced error rates.  BioRxiv ...
+* Barlow A, Hartmann S, Gonzales J, Hofreiter M, Paijmans JLA (2018) Consensify: a method for generating pseudohaploid genome sequences from palaeogenomic datasets with reduced error rates.  BioRxiv ...
 
-Korneliussen TS, Albrechtsen A, Nielsen R (2014) ANGSD : Analysis of Next Generation Sequencing Data. BMC Bioinformatics 15: 356.
+* Korneliussen TS, Albrechtsen A, Nielsen R (2014) ANGSD : Analysis of Next Generation Sequencing Data. BMC Bioinformatics 15: 356.
