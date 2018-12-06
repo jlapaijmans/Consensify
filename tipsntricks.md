@@ -1,4 +1,4 @@
-# CONSENSIFY TIPSNTRICKS
+# Consensify TIPSNTRICKS
 
 Axel Barlow and Johanna L. A. Paijmans, December 2018
 
@@ -16,7 +16,7 @@ angsd -bam bamlist.txt -doCounts 1 -doDepth 1 -maxDepth 200 -minQ 30 -minMapQ 30
 
 Note this should be run using the same filters applied for the base calls, so the coverage calculation is representative. bamlist.txt should be a list of the bam files you want to analyse. The -rf option allows you to exclude small scaffolds. See angsd documentation for full details. Several files are produced as output. One will be the individual coverage for each bam, from which you can determine the 95th percentile
 
-## HOW DO I RUN D STATS ON THE CONSENSIFY FILES?
+## HOW DO I RUN D STATS ON THE Consensify FILES?
 
 There are many options, but we use Dr. James Cahill's excellent scripts written in C++ (https://github.com/jacahill/Admixture). Download and install the scripts, and you can run the Dstat like this:
 
