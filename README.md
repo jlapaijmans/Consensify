@@ -29,7 +29,7 @@ Consensify takes 3 files as input. Small example files are included with the Con
 
 The .counts and .pos files can be generated from a standard bam file using the -doCounts function in angsd (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
 
-> angsd -doCounts 1 -minQ 30 -minMapQ 30 -dumpCounts 3 -rf scaffolds_over_1MB.txt -i in.bam -out out
+    angsd -doCounts 1 -minQ 30 -minMapQ 30 -dumpCounts 3 -rf scaffolds_over_1MB.txt -i in.bam -out out
 
 This command would exclude bases with map and base quality < 30, and only collect base counts for large scaffolds > 1MB (-rf function, see angsd documentation). Your input bam is "in.bam" (-i option) and your output .pos and .counts files will have the prefix "out" (-out option). -doCounts reports the frequency of bases, and -dumpCounts  3 reports the sum occurrence of each base. 
 
@@ -41,7 +41,7 @@ Consensify is a perl script which should run on any UNIX system. Windows is unte
 
 To run Consensify, cd to the directory containing the script and enter:
 
-perl Consensify.pl
+    perl Consensify.pl
 
 This should return the following error message, which describes the 5 arguments required to run Consensify:
 
