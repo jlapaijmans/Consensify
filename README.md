@@ -46,11 +46,11 @@ To run Consensify, cd to the directory containing the script and enter:
 This should return the following error message, which describes the 5 arguments required to run Consensify:
 
     ERROR: script needs five arguments, in this order:
-    name (and location) of .pos file
-    name (and location) of .counts file
-    name (and location) of sequence IDs and lengths
-    name of output file
-    depth threshold for exclusion
+        name (and location) of .pos file
+        name (and location) of .counts file
+        name (and location) of sequence IDs and lengths
+        name of output file
+        depth threshold for exclusion
 
 To run Consensify on the example dataset with a maximum read depth filter of 5 (i.e. only consider positions covered by 5 reads or fewer), enter the following:
 
