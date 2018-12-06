@@ -46,26 +46,26 @@ We often use the ape package in R to generate a distance matrix from the alignme
 
 R
 
-# Load ape library. Do install.packages("ape") if not already installed
+## Load ape library. Do install.packages("ape") if not already installed
 library(ape)
 
-# read in the alignment
+## read in the alignment
 fa <- read.FASTA("alignment.fa") 
 
-# generate the distance matrix, there are several models available
+## generate the distance matrix, there are several models available
 mx <- dist.dna(fa, model="JC69")
 
-# Principal coordinates analysis
+## Principal coordinates analysis
 mx.pcoa <- pcoa(mx)
 
-# plot PCos 1 and 2
+## plot PCos 1 and 2
 plot(mx.pcoa$vectors[,1:2], xlab="PCo1", ylab="PCo2", main="PCo using Consensify")
 
-# calculate NJ tree
+## calculate NJ tree
 tree <- nj(mx)
 
-# root the tree, this assumes the outgroup is the first sequence in the alignment
+## root the tree, this assumes the outgroup is the first sequence in the alignment
 rtree <- root(tree, outgroup=1)
 
-# plot the tree
+## plot the tree
 plot(rtree, main="NJ tree using Consensify")
