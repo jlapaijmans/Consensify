@@ -41,7 +41,7 @@ Consensify is a perl script which should run on any **UNIX** system. Windows is 
 
 To run Consensify, cd to the directory containing the script and enter:
 
-    perl Consensify.pl
+    perl Consensify_vX.pl
 
 This should return the following error message, which describes the 5 arguments required to run Consensify:
 
@@ -54,7 +54,7 @@ This should return the following error message, which describes the 5 arguments 
 
 To run Consensify on the example dataset with a maximum read depth filter of 5 (i.e. only consider positions covered by 5 reads or fewer), enter the following:
 
-    perl makeHaploid_05.pl ./examples/eg.pos ./examples/eg.counts ./examples/scaffold_lengths.txt example.fa 5
+    perl Consensify_vX.pl ./examples/eg.pos ./examples/eg.counts ./examples/scaffold_lengths.txt example.fa 5
 
 A message like this should  be printed to the screen (you can also direct it to an output file using > if you wish to save this information):
 
