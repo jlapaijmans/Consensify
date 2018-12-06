@@ -1,14 +1,14 @@
-CONSENSIFY TIPSNTRICKS
+# CONSENSIFY TIPSNTRICKS
 
 Axel Barlow and Johanna L. A. Paijmans, December 2018
 
 This document assumes you have read the README and have successfully run the example dataset on your system. Here you will find additional info on further analyses, and considerations you may have when you are analysing your own data
 
-WHAT FILTERS SHOULD I USE IN ANGSD?
+## WHAT FILTERS SHOULD I USE IN ANGSD?
 
 This is really up to you, based on the properties of your data and specific research question. As a starting point, you may wish to use map and base quality filters of 30. It is also possible to exclude transitions and/or terminal nucleotides which may be affected by cytosine deamination. However, consensify also reduces such errors and so we typically don't do this. For fragmentary genome assemblies, very small scaffolds may be problematic, so we generally exclude these (e.g. < 100kb or < 1MB)
 
-HOW DO I DECIDE THE MAXIMUM ACCEPTABLE DEPTH?
+## HOW DO I DECIDE THE MAXIMUM ACCEPTABLE DEPTH?
 
 This also also ultimately your decision, but we generally do use a max depth filter since regions with extremely high coverage may represent repetitive elements that the map qualtiy filter failed to mitigate. Typically we use the upper 95th percentile of coverage as a cut off. You can calculate depth in angsd like this:
 
@@ -16,7 +16,7 @@ angsd -bam bamlist.txt -doCounts 1 -doDepth 1 -maxDepth 200 -minQ 30 -minMapQ 30
 
 Note this should be run using the same filters applied for the base calls, so the coverage calculation is representative. bamlist.txt should be a list of the bam files you want to analyse. The -rf option allows you to exclude small scaffolds. See angsd documentation for full details. Several files are produced as output. One will be the individual coverage for each bam, from which you can determine the 95th percentile
 
-HOW DO I RUN D STATS ON THE CONSENSIFY FILES?
+## HOW DO I RUN D STATS ON THE CONSENSIFY FILES?
 
 There are many options, but we use Dr. James Cahill's excellent scripts written in C++ (https://github.com/jacahill/Admixture). Download and install the scripts, and you can run the Dstat like this:
 
@@ -32,7 +32,7 @@ python weighted_block_jackknife.py P1_P2_P3_out.dstat 5000000
 
 See James' Github page for more details, and if you use his scripts then please cite the relevant papers. The f-hat script is also suited to the consensify files.
 
-HOW DO I GENERATE AN INPUT FILE FOR PHYLOGENETIC AND OTHER ANALYSES?
+## HOW DO I GENERATE AN INPUT FILE FOR PHYLOGENETIC AND OTHER ANALYSES?
 
 Again there are many methods. We have written ReDuCToR; a script to combine the separate fasta output files from Consensify into a single alignment and remove all columns with invariant positions and missing data. The output is a fasta file which may be input to a variety of programs, such as R or RAxML. ReDuCToR is included with the Consensify distribution. It requires a basix UNIX toolkit (bash, awk, paste), samtools (Li et al. 2009) and snp-sites (Page et al. 2016). If you use ReDuCToR in your publication, then you must also cite these papers.
 
