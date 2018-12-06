@@ -75,10 +75,10 @@ A message like this should  be printed to the screen (you can also direct it to 
 
 The last line is the number of called bases successfully written to the Consensify pseudohaploid sequence. Note the exact number may vary between runs due the the random sampling of reads. The finished Consensify sequence in fasta format is example.fa, and should look similar to this:
 
-`>scaffold1
-NTTGATCAACGGAACAAGTTACCCTAGGGATAACAGCGCAATCCTATTCAAGAGTNNNNN
->scaffold2
-TCGACAATAGGGTTTACGACCTCGATGTTGGATCAGGACATCCTAATGGTGCAGCAGCTG`
+`>scaffold1`
+`NTTGATCAACGGAACAAGTTACCCTAGGGATAACAGCGCAATCCTATTCAAGAGTNNNNN`
+`>scaffold2`
+`TCGACAATAGGGTTTACGACCTCGATGTTGGATCAGGACATCCTAATGGTGCAGCAGCTG`
 
 We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different maximum depth cut offs and also change the base counts in the eg.counts file to test specific situations relevant to your own data. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
 
