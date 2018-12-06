@@ -81,3 +81,11 @@ root the tree, this assumes the outgroup is the first sequence in the alignment
 plot the tree
 
     plot(rtree, main="NJ tree using Consensify")
+
+## References
+
+* Korneliussen TS, Albrechtsen A, Nielsen R (2014) ANGSD : Analysis of Next Generation Sequencing Data. BMC Bioinformatics 15: 356.
+
+* Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R (2009) The Sequence Alignment/Map format and SAMtools. Bioinformatics 25:2078–2079 . doi: 10.1093/bioinformatics/btp352
+
+* Page AJ, Taylor B, Delaney AJ, Soares J, Seemann T, Keane JA, Harris SR (2016) SNP-sites: rapid efficient extraction of SNPs from multi-FASTA alignments. Microb Genom 2: . doi: 10.1099/mgen.0.000056
