@@ -2,7 +2,7 @@
 
 Documentation for Consensify v2
 
-*The manuscript accompanying this source is available on BioRxiv: https://www.biorxiv.org/content/early/2018/12/18/498915?rss=1*
+*The manuscript accompanying this source is published in Genes 2020: https://www.mdpi.com/2073-4425/11/1/50*
 
 Axel Barlow, Johanna L. A. Paijmans, Andrea Manica
 
@@ -17,7 +17,9 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 Andrea Manica recoded consensify in C++, and also expanded the custom input options. In addition to `-min` minimum covierage and `-max` maximum coverage, we now also have `-n_matches` specifying how many bases need to match for acccepting abase and `-n_random_reads` the number of reads are randomly sampled from the read stack. The manual below is updated to reflect the new version.
 
 ## Introduction
-Consensify is a method for generating a consensus pseudohaploid genome sequence with greatly reduced error rates compared to standard pseudohaploidisation. The method is described in full and tested in the associated publication (Barlow et al. 2018). Briefly, for each position of the reference genome, three bases are selected from the read stack at random. If two or three out of three reads agree, then that base is retained. If only two reads are present, but they agree, then that base is also retained. In either case, if no two reads agree, then an N is entered for that position. If coverage is < 2, or above a maximum depth specified by the user, then an N is entered for that position. An example is shown below. The table summarises a read stack by the number of bases observed in columns (totA, totC, totG, totT) at each position of the reference genome (represented by sequential rows). The Consensify sequence for this read stack would be TGNAC.
+Consensify is a method for generating a consensus pseudohaploid genome sequence with greatly reduced error rates compared to standard pseudohaploidisation. The method is described in full and tested in the associated publication (Barlow et al. 2018). Briefly, in the C version of the method the user specifies `min`, `-max`, `-n_matches`, `-n_random_reads`. If a position has less than `min` or more than `max` coverage, the position is called as an N. If a position passes the coverage filters, `-n_random_reads` are sampled. If at least `-n_matches` of bases match, that position is called. If no bases (or not enough bases) match, the position is called as N.
+
+An example is shown below. The table summarises a read stack by the number of bases observed in columns (totA, totC, totG, totT) at each position of the reference genome (represented by sequential rows). 
 
     totA	totC	totG	totT
     0	0	1	2
@@ -25,6 +27,8 @@ Consensify is a method for generating a consensus pseudohaploid genome sequence 
     1	0	0	1
     4	0	0	0
     0	4	1	0
+
+For filters `-min 2 -max 99 -n_matches 2 -n_random_reads 3`, the Consensify sequence for this example would be TGNAC.
 
 ## Compiling Consensify
 
