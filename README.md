@@ -46,7 +46,7 @@ Consensify takes 3 files as input. Small example files are included with the Con
 
 `examples/eg_missingness.pos` – a file containing a 3 column table: scaffold name, position, read depth
 
-`examples/scaffold_lengths_missingness.txt` – file containing a 3 column table: scaffold name, start, end
+`examples/scaffold_lengths_missingness.txt` – file containing a 3 column table: scaffold name, start, end. Requires header "name	start	end"
 
 The .counts and .pos files can be generated from a standard bam file using the -doCounts function in angsd (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
 
@@ -71,16 +71,17 @@ This should return an error message, as you've given no input. To see the inputs
 which will return
 
 ```
-welcome to consensify_c v2
+welcome to consensify_c v2.1
 Available options:
 
 -p filename(with path) of the positions file (required)
 -c filename(with path) of the counts file (required)
+-s filename(with path) of the scaffold file (required)
 -o filename(with path) of the output fasta (required
 -min minimum coverage for which positions should be called (defaults to 2)
 -max maximum coverage for which positions should be called (defaults to 100)
 -n_matches number of matches required to call a position (defaults to 2)
--n_random_reads number of random reads used (note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)
+-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)
 -v verbose output to stout
 -h a list of available options (note that other options will be ignored)
 example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
@@ -93,8 +94,7 @@ To run Consensify on the example dataset, enter the following:
 A message like this should  be printed to the screen
 
 ```
-welcome to consensify_c v2
-eg_missingness.counts
+welcome to consensify_c v2.1
 all done
 ```
 
