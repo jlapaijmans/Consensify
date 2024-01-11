@@ -1,2 +1,0 @@
-scaffold1	60
-scaffold2	60
