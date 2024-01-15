@@ -1,16 +1,25 @@
 # Consensify
 
-Documentation for Consensify v0.1
+Documentation for Consensify v2
 
-*The manuscript accompanying this source is available on BioRxiv: https://www.biorxiv.org/content/early/2018/12/18/498915?rss=1*
+*The manuscript accompanying this source is published in Genes 2020: https://www.mdpi.com/2073-4425/11/1/50*
 
-Axel Barlow and Johanna L. A. Paijmans, December 2018
+Axel Barlow, Johanna L. A. Paijmans, Andrea Manica
+
+Updtaed: January 2024
 
 emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
+## Version log
+
+### Version 2
+
+Andrea Manica recoded consensify in C++, and also expanded the custom input options. In addition to `-min` minimum covierage and `-max` maximum coverage, we now also have `-n_matches` specifying how many bases need to match for acccepting abase and `-n_random_reads` the number of reads are randomly sampled from the read stack. The manual below is updated to reflect the new version.
 
 ## Introduction
-Consensify is a method for generating a consensus pseudohaploid genome sequence with greatly reduced error rates compared to standard pseudohaploidisation. The method is described in full and tested in the associated publication (Barlow et al. 2018). Briefly, for each position of the reference genome, three bases are selected from the read stack at random. If two or three out of three reads agree, then that base is retained. If only two reads are present, but they agree, then that base is also retained. In either case, if no two reads agree, then an N is entered for that position. If coverage is < 2, or above a maximum depth specified by the user, then an N is entered for that position. An example is shown below. The table summarises a read stack by the number of bases observed in columns (totA, totC, totG, totT) at each position of the reference genome (represented by sequential rows). The Consensify sequence for this read stack would be TGNAC.
+Consensify is a method for generating a consensus pseudohaploid genome sequence with greatly reduced error rates compared to standard pseudohaploidisation. The method is described in full and tested in the associated publication (Barlow et al. 2018). Briefly, in the C version of the method the user specifies `min`, `-max`, `-n_matches`, `-n_random_reads`. If a position has less than `min` or more than `max` coverage, the position is called as an N. If a position passes the coverage filters, `-n_random_reads` are sampled. If at least `-n_matches` of bases match, that position is called. If no bases (or not enough bases) match, the position is called as N.
+
+An example is shown below. The table summarises a read stack by the number of bases observed in columns (totA, totC, totG, totT) at each position of the reference genome (represented by sequential rows). 
 
     totA	totC	totG	totT
     0	0	1	2
@@ -19,19 +28,29 @@ Consensify is a method for generating a consensus pseudohaploid genome sequence 
     4	0	0	0
     0	4	1	0
 
+For filters `-min 2 -max 99 -n_matches 2 -n_random_reads 3`, the Consensify sequence for this example would be TGNAC.
+
+## Compiling Consensify
+
+After cloning this repo, navigate to it and compile consensify using
+
+```
+g++ consensify_c.cpp -o consensify_c -std=c++11
+```
+
 
 ## Input data
 Consensify takes 3 files as input. Small example files are included with the Consensify distribution, in the “examples” directory:
 
-`examples/eg.counts` – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
+`examples/eg_missingness.counts` – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
 
-`examples/eg.pos` – a file containing a 3 column table: scaffold name, position, read depth
+`examples/eg_missingness.pos` – a file containing a 3 column table: scaffold name, position, read depth
 
-`examples/scaffold_lengths.txt` – file containing a 2 column table: scaffold name, length
+`examples/scaffold_lengths_missingness.txt` – file containing a 3 column table: scaffold name, start, end. Requires header "name	start	end"
 
 The .counts and .pos files can be generated from a standard bam file using the -doCounts function in angsd (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
 
-    angsd -doCounts 1 -minQ 30 -minMapQ 30 -dumpCounts 3 -rf scaffolds_over_1MB.txt -i in.bam -out out
+`angsd -doCounts 1 -minQ 30 -minMapQ 30 -dumpCounts 3 -rf scaffolds_over_1MB.txt -i in.bam -out out`
 
 This command would exclude bases with map and base quality < 30, and only collect base counts for large scaffolds > 1MB (-rf function, see angsd documentation). Your input bam is "in.bam" (-i option) and your output .pos and .counts files will have the prefix "out" (-out option). -doCounts reports the frequency of bases, and -dumpCounts  3 reports the sum occurrence of each base. 
 
@@ -39,56 +58,65 @@ The .lengths file has to be created by the user. See the example scaffold_length
 
 
 ## Running Consensify
-Consensify is a perl script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** versions 14.04 and 16.04. 
+Consensify is a perl script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** LTS versions 2014-2022.
 
-To run Consensify, cd to the directory containing the script and enter:
+To run Consensify, cd to the directory containing the executable and enter:
 
-    perl Consensify_vX.pl
+`./consensify_c`
 
-This should return the following error message, which describes the 5 arguments required to run Consensify:
+This should return an error message, as you've given no input. To see the inputs requuired, type
 
-    ERROR: script needs five arguments, in this order:
-        name (and location) of .pos file
-        name (and location) of .counts file
-        name (and location) of sequence IDs and lengths
-        name of output file
-        depth threshold for exclusion
+`./consensify_c -h`
 
-To run Consensify on the example dataset with a maximum read depth filter of 5 (i.e. only consider positions covered by 5 reads or fewer), enter the following:
+which will return
 
-    perl Consensify_vX.pl ./examples/eg.pos ./examples/eg.counts ./examples/scaffold_lengths.txt example.fa 5
+```
+welcome to consensify_c v2.1
+Available options:
 
-A message like this should  be printed to the screen (you can also direct it to an output file using > if you wish to save this information):
+-p filename(with path) of the positions file (required)
+-c filename(with path) of the counts file (required)
+-s filename(with path) of the scaffold file (required)
+-o filename(with path) of the output fasta (required
+-min minimum coverage for which positions should be called (defaults to 2)
+-max maximum coverage for which positions should be called (defaults to 100)
+-n_matches number of matches required to call a position (defaults to 2)
+-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)
+-v verbose output to stout
+-h a list of available options (note that other options will be ignored)
+example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
+```
 
-    running script  
-      depthsFile: ./examples/eg.pos
-      countsFile: ./examples/eg.counts
-      seqLenFile: ./examples/scaffold_lengths.txt
-      outputFile: example.fa
-      k         : 5         
+To run Consensify on the example dataset, enter the following:
 
-    hash is done! 
-    processing 
-       ...scaffold1
-       ...scaffold2
+ ```
+ consensify_c -c examples/eg_missingness.counts -p examples/eg_missingness.pos -s examples/scaffold_lengths_missingness.txt -o missing.fasta
+```
 
-     all done! output is in file example.fa
-    positions processed: 115
+A message like this should  be printed to the screen
 
-The last line is the number of called bases successfully written to the Consensify pseudohaploid sequence. Note the exact number may vary between runs due the the random sampling of reads. The finished Consensify sequence in fasta format is example.fa, and should look similar to this:
+```
+welcome to consensify_c v2.1
+all done
+```
 
-    >scaffold1
-    NTTGATCAACGGAACAAGTTACCCTAGGGATAACAGCGCAATCCTATTCAAGAGTNNNNN
-    >scaffold2
-    TCGACAATAGGGTTTACGACCTCGATGTTGGATCAGGACATCCTAATGGTGCAGCAGCTG
+The finished Consensify sequence in fasta format is example.fa, and should look similar to this:
 
-We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different maximum depth cut offs and also change the base counts in the eg.counts file to test specific situations relevant to your own data. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
+```
+>scaffold1
+TTGACACGAAAGTTCCTGGAAACACGCATCTTTCGAGTN
+>scaffold2
+ACACAAGGGTTACACTGATTGGAAGGCACTAATGTGCGAGTG
+```
+
+We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different min/max depth cut offs, the number of reads sampled, number of matches. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
 
 
 ## Computational requirements
-Consensify runs on a single processor. On a system running **Scientific Linux** and with 16Gb RAM per CPU, we are generally able to compute a Consensify pseudohaploid sequence for a medium (~10x) coverage mammalian genome dataset in less than one day. Note that computational time increases asymptotically with sequencing coverage, since more positions are covered by > 2 reads.
 
-The .pos and .counts files output by angsd are compressed (.gz), and must be uncompressed prior to computation with Consensify. The combined uncompressed size of these files can be around 40Gb. During the Consensify analysis, an intermediate file of equivalent size is generated. After computation, this file is automatically deleted, and the input .pos and .counts files can be compressed or deleted. The finished Consensify fasta will be around the size of the reference genome assembly, i.e. ~2.5 Gb for a mammal. If the computation terminates prematurely, then the intermediate file may not be deleted, and you may wish to delete it manually. Keep in mind that for the described computation at some stage >80Gb for disk space is being used. Thus, if you have a 1TB hard drive and run 12 such analysis simultaneously, you run the risk of running out of space. You have been warned - we are not responsible for killing your computer ;) 
+We have not run extensive testing of the new C++ version of consensify, so although it is of course a lot faster than the old Perl version, we don't know how much faster or how much RAM it needs. You have been warned - we are not responsible for killing your computer ;) 
+
+The .pos and .counts files output by angsd are compressed (.gz), and must be uncompressed prior to computation with Consensify. The combined uncompressed size of these files can be around 40Gb. During the Consensify analysis, an intermediate file of equivalent size is generated. After computation, this file is automatically deleted, and the input .pos and .counts files can be compressed or deleted. The finished Consensify fasta will be around the size of the reference genome assembly, i.e. ~2.5 Gb for a mammal. If the computation terminates prematurely, then the intermediate file may not be deleted, and you may wish to delete it manually. 
 
 
 ## Using Consensify for your own research
@@ -101,3 +129,5 @@ Finally if you like Consensify, if you need help, or if you have ideas on how Co
 * Barlow A, Hartmann S, Gonzales J, Hofreiter M, Paijmans JLA (2018) Consensify: a method for generating pseudohaploid genome sequences from palaeogenomic datasets with reduced error rates.  BioRxiv ...
 
 * Korneliussen TS, Albrechtsen A, Nielsen R (2014) ANGSD : Analysis of Next Generation Sequencing Data. BMC Bioinformatics 15: 356.
+
+
