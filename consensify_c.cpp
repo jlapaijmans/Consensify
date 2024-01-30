@@ -3,7 +3,7 @@
 // Author      : Andrea Manica
 // Version     : 0.1.1
 // Copyright   : Your copyright notice
-// Description : A general, C-based implemetnation of hte Consensify algorithm
+// Description : A general, C-based implementation of the Consensify algorithm
 //============================================================================
 
 // ~/eclipse-workspace/consensify_c/Debug/consensify_c -c eg.counts -p eg.pos -o eg.fasta
@@ -63,6 +63,13 @@ void split_4int(const std::string &s, char delim, std::vector<int> &elems) {
 		std::getline(ss, item, delim);
 		elems[i]= stoi(item);
 	}
+}
+
+std::string trim( const std::string & s )
+{
+  auto first = s.find_first_not_of( " \f\n\r\t\v" );
+  auto last  = s.find_last_not_of ( " \f\n\r\t\v" );
+  return (first == s.npos) ? "" : s.substr( first, last+1 );
 }
 
 
@@ -223,19 +230,31 @@ int main(int argc, char **argv){
 
 
 		// if the scaffold name differs from the current info from the scaffold file, get the next one
-		if (chr_name!=chr_name_ref){
+		while (chr_name!=chr_name_ref){
 			std::getline(infile_scaffolds, line_scaffolds);
+		  // check that the last line is not an empty line
+		  if (trim(line_scaffolds).empty()){
+		    std::cout<<"ERROR: scaffold in the position file and scaffold file do not match (or are out of order)\n";
+		    std::cout<<"we failed to find "<<chr_name<<" as read in the positions file\n";
+		    exit(1);
+		    
+		  }
 			split_1char_2int(line_scaffolds, '\t', chr_name_ref, start, end);
 			// if it is still different, abort
 			if (chr_name!=chr_name_ref){
-				std::cout<<"ERROR: scaffold in the position and scaffold file do not match, or are out of order\n";
-				std::cout<<"When expecting "<<chr_name<<" as read in the positions file, we get "<<chr_name_ref<<" in the scaffold file\n";
+			  if (infile_scaffolds.peek() == EOF){
+				std::cout<<"ERROR: scaffold in the position file and scaffold file do not match (or are out of order)\n";
+				std::cout<<"we failed to find "<<chr_name<<" as read in the positions file\n";
 				exit(1);
 			}
+			}
+			// if we have found the correct scaffold
+			if (chr_name==chr_name_ref) {
 			if (position>start){ // if we have a new scaffold, but the first position in the pos file is not the same as the start of the scaffold, add some Ns
 				for (int i=0;i<position-start;i++){
 					outfile_fasta<<"N";
 				}
+			}
 			}
 		}
 
