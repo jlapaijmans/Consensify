@@ -80,6 +80,7 @@ int main(int argc, char **argv){
 	int n_matches_to_call = 2;
 	int n_random_reads = 3;
 	bool verbose = false;
+	bool empty_contigs = false;
 
 
 	// parse options
@@ -96,7 +97,8 @@ int main(int argc, char **argv){
 		std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
 		std::cout<<"-n_matches number of matches required to call a position (defaults to 2)\n";
 		std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)\n";
-		std::cout<<"-v verbose output to stout\n";
+		std::cout<<"-v if set, verbose output to stout\n";
+		std::cout<<"-empty_contigs if set, empty contigs in the counts file are filled as N";
 		std::cout<<"-h a list of available options (note that other options will be ignored)";
 		std::cout<<"\n";
 		std::cout<<"example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta\n";
@@ -140,6 +142,9 @@ int main(int argc, char **argv){
 	const std::string &n_random_reads_string = input.getCmdOption("-n_random_reads");
 	if (!n_random_reads_string.empty()){
 		n_random_reads = stoi(n_random_reads_string);
+	}
+	if(input.cmdOptionExists("-empty_contigs")){
+		empty_contigs = true;
 	}
 
 	// dictionary vector
@@ -213,10 +218,13 @@ int main(int argc, char **argv){
 					}
 				}
 				outfile_fasta<<std::endl;
-			}
+			} 
+//			else {
+//			outfile_fasta<<">"<<chr_name<<std::endl;
+//			}
 			chr_name_current = chr_name;
 			// write out the new scaffold name
-			outfile_fasta<<">"<<chr_name<<std::endl;
+			
 			position_previous = position -1;
 		}
 
@@ -240,16 +248,24 @@ int main(int argc, char **argv){
 		    
 		  }
 			split_1char_2int(line_scaffolds, '\t', chr_name_ref, start, end);
-			// if it is still different, abort
+			// if it is still different
 			if (chr_name!=chr_name_ref){
+			  // abort if are getting to the end of file
 			  if (infile_scaffolds.peek() == EOF){
 				std::cout<<"ERROR: scaffold in the position file and scaffold file do not match (or are out of order)\n";
 				std::cout<<"we failed to find "<<chr_name<<" as read in the positions file\n";
 				exit(1);
+			} else if (empty_contigs){ //else we fill the contig with N if requested
+			outfile_fasta<<">"<<chr_name_ref<<std::endl;
+				for (int i=start;i<end+1;i++){
+					outfile_fasta<<"N";
+				}
+				outfile_fasta<<"\n";
 			}
 			}
 			// if we have found the correct scaffold
 			if (chr_name==chr_name_ref) {
+			outfile_fasta<<">"<<chr_name<<std::endl;
 			if (position>start){ // if we have a new scaffold, but the first position in the pos file is not the same as the start of the scaffold, add some Ns
 				for (int i=0;i<position-start;i++){
 					outfile_fasta<<"N";
