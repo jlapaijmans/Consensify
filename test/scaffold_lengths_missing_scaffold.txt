@@ -1,0 +1,5 @@
+name	start	end
+scaffold1	1	60
+scaffold1.5	1	60
+scaffold2	1	60
+
