@@ -1,5 +1,7 @@
 name	start	end
+scaffold0.5	1	30
 scaffold1	1	60
 scaffold1.5	1	60
-scaffold2	1	60
+scaffold2	1	50
+scaffold2.1	1	80
 

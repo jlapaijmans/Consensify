@@ -1,3 +1,0 @@
-name	start	end
-scaffold1	1	60
-scaffold2	10	60
