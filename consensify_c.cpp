@@ -337,7 +337,7 @@ int main(int argc, char **argv){
       outfile_fasta<<"N";
     }
   }
-  // now check that we don't ahve any empty scaffolds at the end of the scaffold file
+  // now check that we don't have any empty scaffolds at the end of the scaffold file
   if (no_empty_scaffold){
     while (std::getline(infile_scaffolds, line_scaffolds)){
       // check that the last line is not an empty line
@@ -346,7 +346,7 @@ int main(int argc, char **argv){
       }
       split_1char_2int(line_scaffolds, '\t', chr_name_ref, start, end);      
     }
-    outfile_fasta<<">"<<chr_name_ref<<std::endl;
+    outfile_fasta<<"\n>"<<chr_name_ref<<std::endl;
     if (position>start){
       for (int i=0;i<position-start;i++){
         outfile_fasta<<"N";
