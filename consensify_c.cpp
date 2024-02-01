@@ -1,12 +1,11 @@
 //============================================================================
 // Name        : consensify_c.cpp
 // Author      : Andrea Manica
-// Version     : 0.1.1
+// Version     : 2.2
 // Copyright   : Your copyright notice
 // Description : A general, C-based implementation of the Consensify algorithm
 //============================================================================
 
-// ~/eclipse-workspace/consensify_c/Debug/consensify_c -c eg.counts -p eg.pos -o eg.fasta
 
 #include <iostream>
 #include <vector>
@@ -37,8 +36,26 @@ public:
     return std::find(this->tokens.begin(), this->tokens.end(), option)
     != this->tokens.end();
   }
+  bool allValidOptions() const{
+    for (int i=0;i<this->tokens.size();i++){
+      std::string i_token = this->tokens[i];
+      if (std::find(this->validOptions.begin(), this->validOptions.end(), i_token) == this->validOptions.end()) {
+        std::cerr << "The option "<<i_token<<" is not valid; use -h to get a list of all valid options"<<std::endl;
+        return false;
+    }
+    // if this option takes an argument, skip it and move to the next option
+    if (std::find(this->validOptionsWithArgument.begin(), this->validOptionsWithArgument.end(), i_token) != this->validOptionsWithArgument.end()) {
+      i++;
+    }
+}
+return true;}
+    
 private:
   std::vector <std::string> tokens;
+  // set of valid options
+  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random","-v","-no_empty_scaffold","-h"};
+  // set of options that take an additional argument
+  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random"};
 };
 
 // custom splitter for a file with one char field followed by 2 integer fields (as used in the position and scaffold file
@@ -80,12 +97,13 @@ int main(int argc, char **argv){
   int n_matches_to_call = 2;
   int n_random_reads = 3;
   bool verbose = false;
-  bool no_empty_scaffold = false;
+  bool empty_scaffold = true;
   
   
   // parse options
-  cout << "welcome to consensify_c v2.1" << endl;
+  cout << "welcome to consensify_c v2.2" << endl;
   InputParser input(argc, argv);
+  
   if(input.cmdOptionExists("-h")){
     std::cout<<"Available options:\n";
     std::cout<<"\n";
@@ -104,6 +122,12 @@ int main(int argc, char **argv){
     std::cout<<"example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta\n";
     exit(0);
   }
+  // check that all options are valid
+  if (!input.allValidOptions()){
+  	exit(1);
+  }
+  
+  
   if(input.cmdOptionExists("-v")){
     verbose = true;
   }
@@ -144,7 +168,7 @@ int main(int argc, char **argv){
     n_random_reads = stoi(n_random_reads_string);
   }
   if(input.cmdOptionExists("-no_empty_scaffold")){
-    no_empty_scaffold = true;
+    empty_scaffold = false;
   }
   
   // dictionary vector
@@ -242,7 +266,7 @@ int main(int argc, char **argv){
           std::cout<<"ERROR: scaffold in the position file and scaffold file do not match (or are out of order)\n";
           std::cout<<"we failed to find "<<chr_name<<" as read in the positions file\n";
           exit(1);
-        } else if (no_empty_scaffold){ //else we fill the contig with N if requested
+        } else if (empty_scaffold){ //else we fill the contig with N if requested
           outfile_fasta<<">"<<chr_name_ref<<std::endl;
           for (int i=start;i<end+1;i++){
             outfile_fasta<<"N";
@@ -338,7 +362,7 @@ int main(int argc, char **argv){
     }
   }
   // now check that we don't have any empty scaffolds at the end of the scaffold file
-  if (no_empty_scaffold){
+  if (empty_scaffold){
     while (std::getline(infile_scaffolds, line_scaffolds)){
       // check that the last line is not an empty line
       if (trim(line_scaffolds).empty()){
