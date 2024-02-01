@@ -1,6 +1,10 @@
 # run tests with
 # Rscript ./test_consensify.R
 
+if(!require("testthat")) install.packages("testthat")
+if(!require("ape")) install.packages("ape")
+
+
 library(testthat)
 # remove the old test fasta file if it still exists
 if (file.exists("./test.fasta")){
