@@ -92,7 +92,7 @@ std::string trim( const std::string & s )
 
 int main(int argc, char **argv){
   // defaults values
-  int min_depth = 2;
+  int min_depth = 3;
   int max_depth = 100;
   int n_matches_to_call = 2;
   int n_random_reads = 3;
@@ -111,15 +111,16 @@ int main(int argc, char **argv){
     std::cout<<"-c filename(with path) of the counts file (required)\n";
     std::cout<<"-s filename(with path) of the scaffold file (required)\n";
     std::cout<<"-o filename(with path) of the output fasta (required\n";
-    std::cout<<"-min minimum coverage for which positions should be called (defaults to 2)\n";
+    std::cout<<"-min minimum coverage for which positions should be called (defaults to 3)\n";
     std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
     std::cout<<"-n_matches number of matches required to call a position (defaults to 2)\n";
     std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)\n";
     std::cout<<"-v if set, verbose output to stout\n";
-    std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are filled in as N in the fasta output";
-    std::cout<<"-h a list of available options (note that other options will be ignored)";
+    std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output\n";
+    std::cout<<"-h a list of available options (note that other options will be ignored)\n";
     std::cout<<"\n";
     std::cout<<"example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta\n";
+    std::cout<<"\n";
     exit(0);
   }
   // check that all options are valid
