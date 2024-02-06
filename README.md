@@ -93,7 +93,7 @@ example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
 To run Consensify on the example dataset, enter the following:
 
 ```
- consensify_c -c test/eg_missingness.counts -p test/eg_missingness.pos -s test/scaffold_lengths_missingness.txt -o test/test.fasta
+ consensify_c -c test/eg_missingness.counts -p test/eg_missingness.pos -s test/scaffold_lengths_missing_scaffolds.txt -o test/test.fasta
 ```
 
 A message like this should  be printed to the screen
