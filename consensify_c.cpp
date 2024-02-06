@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : consensify_c.cpp
-// Author      : Andrea Manica
+// Author      : Andrea Manica, Johanna Paijmans, Axel Barlow
 // Version     : 2.2
 // Copyright   : Your copyright notice
 // Description : A general, C-based implementation of the Consensify algorithm
@@ -370,13 +370,15 @@ int main(int argc, char **argv){
         break;
       }
       split_1char_2int(line_scaffolds, '\t', chr_name_ref, start, end);      
-    }
+
     outfile_fasta<<"\n>"<<chr_name_ref<<std::endl;
     if (position>start){
       for (int i=0;i<position-start;i++){
         outfile_fasta<<"N";
       }
     }
+    }
+    
   }
   
   outfile_fasta<<std::endl;

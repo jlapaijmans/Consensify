@@ -15,12 +15,14 @@ test_that("consensify files with all scaffolds present",{
   system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths.txt -o test.fasta")
   test <- ape::read.FASTA("./test.fasta")
   test <- as.character(test) ## cast it to character for easier testing
+  expect_true(length(test)==2)
   expect_true(length(test$scaffold1)==60)
   expect_true(length(test$scaffold2)==50)
   expect_true(test$scaffold1[1]=="n")
   expect_true(test$scaffold1[49]!="n")
   expect_true(all(test$scaffold1[50:51]=="n"))
-  expect_true(all(test$scaffold1[52:55]!="n")) # called as depth =2
+  expect_true(all(test$scaffold1[52:55]=="n")) # not called as depth =2
+  expect_true(all(test$scaffold1[56:57]=="n")) # missing
   expect_true(test$scaffold1[58]=="n") # as depth is too low
   expect_true(test$scaffold1[59]=="n")
   expect_true(test$scaffold2[50]=="n")
