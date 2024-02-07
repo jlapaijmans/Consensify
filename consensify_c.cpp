@@ -53,9 +53,9 @@ return true;}
 private:
   std::vector <std::string> tokens;
   // set of valid options
-  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random","-v","-no_empty_scaffold","-h"};
+  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-v","-no_empty_scaffold","-h"};
   // set of options that take an additional argument
-  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random"};
+  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads"};
 };
 
 // custom splitter for a file with one char field followed by 2 integer fields (as used in the position and scaffold file
