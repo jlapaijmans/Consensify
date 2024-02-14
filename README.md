@@ -71,26 +71,29 @@ This should return an error message, as you've given no input. To see the inputs
 which will return
 
 ```
-welcome to consensify_c v2.1
+welcome to consensify_c v2.2
 Available options:
 
 -p filename(with path) of the positions file (required)
 -c filename(with path) of the counts file (required)
 -s filename(with path) of the scaffold file (required)
 -o filename(with path) of the output fasta (required
--min minimum coverage for which positions should be called (defaults to 2)
+-min minimum coverage for which positions should be called (defaults to 3)
 -max maximum coverage for which positions should be called (defaults to 100)
 -n_matches number of matches required to call a position (defaults to 2)
 -n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)
--v verbose output to stout
+-v if set, verbose output to stout
+-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output
 -h a list of available options (note that other options will be ignored)
+
 example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
+
 ```
 
 To run Consensify on the example dataset, enter the following:
 
- ```
- consensify_c -c examples/eg_missingness.counts -p examples/eg_missingness.pos -s examples/scaffold_lengths_missingness.txt -o missing.fasta
+```
+ consensify_c -c test/eg_missingness.counts -p test/eg_missingness.pos -s test/scaffold_lengths_missing_scaffolds.txt -o test/test.fasta
 ```
 
 A message like this should  be printed to the screen
@@ -103,11 +106,19 @@ all done
 The finished Consensify sequence in fasta format is example.fa, and should look similar to this:
 
 ```
+>scaffold0.5
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 >scaffold1
-TTGACACGAAAGTTCCTGGAAACACGCATCTTTCGAGTN
+NTTGANCNACNGAANNAGTTNNCCTNGGNANAACANCGCANTNCTNTTCNNGAGTNNNNN
+>scaffold1.5
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 >scaffold2
-ACACAAGGGTTACACTGATTGGAAGGCACTAATGTGCGAGTG
+TCNACNANAGGGNTTACNANCTNGATNNTGGANNAGGNCANCNTAATNGN
+>scaffold2.1
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 ```
+
+The default behaviour is that any empty scaffolds (where no reads were mapped/passed filters) are printed as an 'empty' scaffolds made up of Ns. If you do not want this, you can use the `-no_empty_scaffold` flag which will result in no empty scaffolds in the fasta output.
 
 We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different min/max depth cut offs, the number of reads sampled, number of matches. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
 
