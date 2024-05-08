@@ -29,6 +29,25 @@ test_that("consensify files with all scaffolds present",{
   file.remove("./test.fasta")
 })
 
+# test with a simple set with full scaffolds
+test_that("consensify files with min 2 and random reads 3",{
+  system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths.txt -o test.fasta -min 2 -max 99 -n_matches 2 -n_random_reads 3")
+  test <- ape::read.FASTA("./test.fasta")
+  test <- as.character(test) ## cast it to character for easier testing
+  expect_true(length(test)==2)
+  expect_true(length(test$scaffold1)==60)
+  expect_true(length(test$scaffold2)==50)
+  expect_true(test$scaffold1[1]=="n")
+  expect_true(test$scaffold1[49]!="n")
+  expect_true(all(test$scaffold1[50:51]=="n"))
+  expect_true(all(!test$scaffold1[52:55]=="n")) # called as depth =2
+  expect_true(all(test$scaffold1[56:57]=="n")) # missing
+  expect_true(test$scaffold1[58]=="n") # as depth is too low
+  expect_true(test$scaffold1[59]=="n")
+  expect_true(test$scaffold2[50]=="n")
+  file.remove("./test.fasta")
+})
+
 # test for missing scaffolds at beginning middle and end, without filling
 test_that("consensify files with missing scaffolds",{
   system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta")
