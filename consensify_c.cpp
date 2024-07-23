@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : consensify_c.cpp
 // Author      : Andrea Manica, Johanna Paijmans, Axel Barlow
-// Version     : 2.2
+// Version     : 2.3.9001
 // Copyright   : Your copyright notice
 // Description : A general, C-based implementation of the Consensify algorithm
 //============================================================================
@@ -12,8 +12,11 @@
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <string>
 #include <algorithm>
+#include <memory>
 using namespace std;
+#include <zlib.h>
 
 // from https://stackoverflow.com/questions/865668/parsing-command-line-arguments-in-c
 // this avoids non-standard dependencies, as we just need to parse a couple of simple arguments
@@ -53,9 +56,9 @@ return true;}
 private:
   std::vector <std::string> tokens;
   // set of valid options
-  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-v","-no_empty_scaffold","-h"};
+  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-v","-no_empty_scaffold","-h","-seed"};
   // set of options that take an additional argument
-  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads"};
+  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-seed"};
 };
 
 // custom splitter for a file with one char field followed by 2 integer fields (as used in the position and scaffold file
@@ -90,6 +93,86 @@ std::string trim( const std::string & s )
 }
 
 
+// Abstract base class
+class FileReader {
+public:
+    virtual ~FileReader() {}
+
+    virtual bool open(const std::string& filename) = 0;
+    virtual bool read(std::string& line) = 0;
+    virtual void close() = 0;
+};
+
+// Derived class for reading text files
+class TextFileReader : public FileReader {
+private:
+    std::ifstream file;
+
+public:
+    bool open(const std::string& filename) override {
+        file.open(filename);
+        return file.is_open();
+    }
+
+    bool read(std::string& line) override {
+        if (!file.is_open() || file.eof()) {
+            return false;
+        }
+        std::getline(file, line);
+        return !file.eof();
+    }
+
+    void close() override {
+        if (file.is_open()) {
+            file.close();
+        }
+    }
+};
+
+// Derived class for reading gzipped files
+class GzFileReader : public FileReader {
+private:
+    gzFile file;
+
+public:
+    bool open(const std::string& filename) override {
+        file = gzopen(filename.c_str(), "rb");
+        return file != nullptr;
+    }
+
+    bool read(std::string& line) override {
+        if (!file) {
+            return false;
+        }
+        char buffer[1024];
+        line.clear();
+        while (gzgets(file, buffer, sizeof(buffer)) != Z_NULL) {
+          line.append(buffer);
+          if (line.back() == '\n') {
+            line.pop_back();
+            return true;
+          }
+        }
+        return !line.empty();
+    }
+
+    void close() override {
+        if (file) {
+            gzclose(file);
+        }
+    }
+};
+
+// Factory function to create the appropriate FileReader based on file extension
+std::unique_ptr<FileReader> createFileReader(const std::string& filename) {
+    if (filename.size() >= 3 && filename.substr(filename.size() - 3) == ".gz") {
+        return std::make_unique<GzFileReader>();
+    } else {
+        return std::make_unique<TextFileReader>();
+    }
+}
+
+
 int main(int argc, char **argv){
   // defaults values
   int min_depth = 3;
@@ -98,10 +181,11 @@ int main(int argc, char **argv){
   int n_random_reads = 3;
   bool verbose = false;
   bool empty_scaffold = true;
+  int seed;
   
   
   // parse options
-  cout << "welcome to consensify_c v2.2" << endl;
+  cout << "consensify_c v2.3.9001" << endl;
   InputParser input(argc, argv);
   
   if(input.cmdOptionExists("-h")){
@@ -115,6 +199,7 @@ int main(int argc, char **argv){
     std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
     std::cout<<"-n_matches number of matches required to call a position (defaults to 2)\n";
     std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)\n";
+    std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
     std::cout<<"-v if set, verbose output to stout\n";
     std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output\n";
     std::cout<<"-h a list of available options (note that other options will be ignored)\n";
@@ -168,6 +253,14 @@ int main(int argc, char **argv){
   if (!n_random_reads_string.empty()){
     n_random_reads = stoi(n_random_reads_string);
   }
+
+  const std::string &seed_string = input.getCmdOption("-seed");
+  if (!seed_string.empty()){
+    seed = stoi(seed_string);
+  } else {
+    std::random_device rd;
+    seed = rd();
+  }
   if(input.cmdOptionExists("-no_empty_scaffold")){
     empty_scaffold = false;
   }
@@ -176,12 +269,21 @@ int main(int argc, char **argv){
   vector<string> int_to_base{"A","C","G","T"};
   
   // random number generator
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen(seed);
   
-  // ifstreams for counts and positions
-  std::ifstream infile_counts (filename_counts);
-  std::ifstream infile_pos (filename_positions);
+  // streams for counts and positions (either text file or gz)
+  auto infile_counts = createFileReader(filename_counts);
+  if(!infile_counts->open(filename_counts)){
+    std::cout<<"ERROR: could not open the counts file\n";
+    exit(1);
+  }
+  auto infile_pos = createFileReader(filename_positions);
+  if(!infile_pos->open(filename_positions)){
+    std::cout<<"ERROR: could not open the positions file\n";
+    exit(1);
+  }
+
+  // ifstream for scaffolds
   std::ifstream infile_scaffolds (filename_scaffolds);
   
   // ofstream to store info
@@ -192,13 +294,13 @@ int main(int argc, char **argv){
   std::string line_scaffolds;
   
   // check the headers
-  std::getline(infile_counts, line_counts);
+  infile_counts->read(line_counts);
   if (line_counts!="totA	totC	totG	totT"){
     std::cout<<"header line for counts file should be :'totA	totC	totG	totT'"<<std::endl;
     std::cout<<"but we get '"<<line_counts<<"'\n";
     return 1;
   }
-  std::getline(infile_pos, line_pos);
+  infile_pos->read(line_pos);
   if (line_pos!="chr	pos	totDepth"){
     std::cout<<"header line for positions file should be :'chr	pos	totDepth'"<<std::endl;
     std::cout<<"but we get '"<<line_pos<<"'\n";
@@ -226,7 +328,7 @@ int main(int argc, char **argv){
   
   //split_1char_2int(line_scaffold, '\t', chr_name_ref, start, end);
   
-  while (std::getline(infile_pos, line_pos))
+  while (infile_pos->read(line_pos))
   {
     position_previous=position;
     split_1char_2int(line_pos, '\t', chr_name, position, depth);
@@ -301,7 +403,7 @@ int main(int argc, char **argv){
     }
         
     // read in the counts for this position
-    std::getline(infile_counts, line_counts);
+    infile_counts->read(line_counts);
     // if the depth is below the minimum depth, then set this as missing value
     if ((depth>=min_depth) & (depth<=max_depth)){
       // sample randomly
@@ -382,6 +484,6 @@ int main(int argc, char **argv){
   }
   
   outfile_fasta<<std::endl;
-  cout << "all done" << endl;
+  std::cout << "all done" << endl;
   return 0;
 }
