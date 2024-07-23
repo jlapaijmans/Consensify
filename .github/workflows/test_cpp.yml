@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: build
-      run: ./g++ consensify_c.cpp -o consensify_c -lz
+      run: g++ consensify_c.cpp -o consensify_c -lz
     - name: test
       run: |
         cd test
