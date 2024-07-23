@@ -1,0 +1,21 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: build
+      run: ./g++ consensify_c.cpp -o consensify_c -lz
+    - name: test
+      run: |
+        cd test
+        Rscript test_consensify.R
