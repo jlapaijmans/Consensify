@@ -35,7 +35,7 @@ For filters `-min 2 -max 99 -n_matches 2 -n_random_reads 3`, the Consensify sequ
 After cloning this repo, navigate to it and compile consensify using
 
 ```
-g++ consensify_c.cpp -o consensify_c -std=c++11
+g++ consensify_c.cpp -o consensify_c -lz
 ```
 
 
