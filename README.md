@@ -1,5 +1,11 @@
 # Consensify
 
+
+<!-- badges: start -->
+[![conda-single-platform](https://github.com/jlapaijmans/Consensify/actions/workflows/test_cpp.yml/badge.svg)](https://github.com/jlapaijmans/Consensify/actions/workflows/test_cpp.yml)
+<!-- badges: end -->
+
+
 Documentation for Consensify v2
 
 *The manuscript accompanying this source is published in Genes 2020: https://www.mdpi.com/2073-4425/11/1/50*
