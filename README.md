@@ -12,8 +12,6 @@ Documentation for Consensify v2
 
 Axel Barlow, Johanna L. A. Paijmans, Andrea Manica
 
-README updated: January 2024
-
 emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
 ## Version log
