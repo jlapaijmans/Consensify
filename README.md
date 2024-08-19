@@ -20,6 +20,12 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
 ### Version 2
 
+#### consensify_c v2.3.9001
+
+`consensify_c` can now take compressed .pos and .counts input files directly from `angsd`
+
+#### consensify_c v2
+
 Andrea Manica recoded consensify in C++, and also expanded the custom input options. In addition to `-min` minimum covierage and `-max` maximum coverage, we now also have `-n_matches` specifying how many bases need to match for acccepting abase and `-n_random_reads` the number of reads are randomly sampled from the read stack. The manual below is updated to reflect the new version.
 
 ## Introduction
@@ -64,7 +70,7 @@ The .lengths file has to be created by the user. See the example scaffold_length
 
 
 ## Running Consensify
-Consensify is a perl script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** LTS versions 2014-2022.
+Consensify is a C++ script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** LTS versions 2014-2022.
 
 To run Consensify, cd to the directory containing the executable and enter:
 
@@ -88,11 +94,13 @@ Available options:
 -max maximum coverage for which positions should be called (defaults to 100)
 -n_matches number of matches required to call a position (defaults to 2)
 -n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)
+-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)
 -v if set, verbose output to stout
 -no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output
 -h a list of available options (note that other options will be ignored)
 
 example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
+
 
 ```
 
@@ -132,8 +140,6 @@ We strongly recommend that you carefully examine this example file alongside the
 ## Computational requirements
 
 We have not run extensive testing of the new C++ version of consensify, so although it is of course a lot faster than the old Perl version, we don't know how much faster or how much RAM it needs. You have been warned - we are not responsible for killing your computer ;) 
-
-The .pos and .counts files output by angsd are compressed (.gz), and must be uncompressed prior to computation with Consensify. The combined uncompressed size of these files can be around 40Gb. During the Consensify analysis, an intermediate file of equivalent size is generated. After computation, this file is automatically deleted, and the input .pos and .counts files can be compressed or deleted. The finished Consensify fasta will be around the size of the reference genome assembly, i.e. ~2.5 Gb for a mammal. If the computation terminates prematurely, then the intermediate file may not be deleted, and you may wish to delete it manually. 
 
 
 ## Using Consensify for your own research
