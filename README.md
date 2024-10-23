@@ -18,6 +18,12 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
 ### Version 2
 
+#### consensify_c v2.4.0
+
+First official release of `consensify_c`. 
+Also, `consensify_c` is now also available to install using conda: 
+https://bioconda.github.io/recipes/consensify/README.html
+
 #### consensify_c v2.3.9001
 
 `consensify_c` can now take compressed .pos and .counts input files directly from `angsd`
@@ -40,9 +46,31 @@ An example is shown below. The table summarises a read stack by the number of ba
 
 For filters `-min 2 -max 99 -n_matches 2 -n_random_reads 3`, the Consensify sequence for this example would be TGNAC.
 
-## Compiling Consensify
+## Installing Consensify
 
-After cloning this repo, navigate to it and compile consensify using
+### using conda
+
+make sure you have bioconda channel set up:
+
+`conda config --add channels bioconda`
+
+and create a specific environment should you want to:
+
+`conda create --name myenvname`
+
+activate using: 
+
+`conda activate myenvname`
+
+then you can install consensify using:
+
+`conda install consensify`
+
+you can now run consensify using `consensify_c`
+
+### compile from source
+
+If you want to compile consenseify from source: clone this repo, navigate to it and compile consensify using:
 
 ```
 g++ consensify_c.cpp -o consensify_c -lz
@@ -50,38 +78,37 @@ g++ consensify_c.cpp -o consensify_c -lz
 
 
 ## Input data
-Consensify takes 3 files as input. Small example files are included with the Consensify distribution, in the “examples” directory:
+Consensify takes 3 files as input. Small example files are included with the Consensify distribution, in the “test” directory:
 
-`examples/eg_missingness.counts` – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
+`test/eg_missingness.counts.gz` – a file containing the base counts at each position of the reference genome (formatted as shown in the table above)
 
-`examples/eg_missingness.pos` – a file containing a 3 column table: scaffold name, position, read depth
+`test/eg_missingness.pos.gz` – a file containing a 3 column table: scaffold name, position, read depth
 
-`examples/scaffold_lengths_missingness.txt` – file containing a 3 column table: scaffold name, start, end. Requires header "name	start	end"
+`test/scaffold_lengths_missingness.txt` – file containing a 3 column table: scaffold name, start, end. Requires header "name	start	end"
 
-The .counts and .pos files can be generated from a standard bam file using the -doCounts function in angsd (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
+The .counts and .pos files can be generated from a standard bam file using the -doCounts function in `angsd` (Korneliussen et al. 2014), or using any method chosen by the user. angsd is especially convenient since it runs fast and allows a very wide range of useful filters to be applied: e.g. minimum map and base quality, exclusion of transitions, exclusion of specific scaffolds, and the option to exclude a specified number of terminal nucleotides from each read. An example angsd command to generate the input files would be:
 
 `angsd -doCounts 1 -minQ 30 -minMapQ 30 -dumpCounts 3 -rf scaffolds_over_1MB.txt -i in.bam -out out`
 
 This command would exclude bases with map and base quality < 30, and only collect base counts for large scaffolds > 1MB (-rf function, see angsd documentation). Your input bam is "in.bam" (-i option) and your output .pos and .counts files will have the prefix "out" (-out option). -doCounts reports the frequency of bases, and -dumpCounts  3 reports the sum occurrence of each base. 
 
-The .lengths file has to be created by the user. See the example scaffold_lengths.txt in the example directory. It's a simple 2-column tab delimited text file containing scaffold names and their length in nucleotides, respectively. A suggested approach for generated this file is to use “samtools faidx reference.fasta”, and then extracting the first and second column from the resulting .fai file (e.g. awk ‘{print $1, $2}’ reference.fasta.fai). Note that the scaffold name should only include that preceding the first whitespace " " delimiter. The order of scaffolds should match that in the reference used for mapping. If you have excluded any scaffolds from your angsd analysis, they should also be excluded from the .lengths file. 
 
 
 ## Running Consensify
-Consensify is a C++ script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. We have tested it on **Scientific Linux v6** and **Ubuntu** LTS versions 2014-2022.
+Consensify is a C++ script which should run on any **UNIX** system. Windows is untested and unsupported, but may be possible. 
 
-To run Consensify, cd to the directory containing the executable and enter:
+To run Consensify, enter:
 
-`./consensify_c`
+`consensify_c`
 
 This should return an error message, as you've given no input. To see the inputs requuired, type
 
-`./consensify_c -h`
+`consensify_c -h`
 
 which will return
 
 ```
-welcome to consensify_c v2.2
+consensify_c v2.4.0
 Available options:
 
 -p filename(with path) of the positions file (required)
@@ -105,13 +132,13 @@ example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
 To run Consensify on the example dataset, enter the following:
 
 ```
- consensify_c -c test/eg_missingness.counts -p test/eg_missingness.pos -s test/scaffold_lengths_missing_scaffolds.txt -o test/test.fasta
+consensify_c -c test/eg_missingness.counts.gz -p test/eg_missingness.pos.gz -s test/scaffold_lengths_missing_scaffold.txt -o test/test.fasta
 ```
 
 A message like this should  be printed to the screen
 
 ```
-welcome to consensify_c v2.1
+consensify_c v2.4.0
 all done
 ```
 
@@ -130,9 +157,12 @@ TCNACNANAGGGNTTACNANCTNGATNNTGGANNAGGNCANCNTAATNGN
 NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 ```
 
-The default behaviour is that any empty scaffolds (where no reads were mapped/passed filters) are printed as an 'empty' scaffolds made up of Ns. If you do not want this, you can use the `-no_empty_scaffold` flag which will result in no empty scaffolds in the fasta output.
 
-We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different min/max depth cut offs, the number of reads sampled, number of matches. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
+The .lengths file for `consensify_c` has to be created by the user. See the example scaffold_lengths.txt in the example directory. It's a 3-column tab delimited text file containing scaffold names, and their start and end position. The column headers have to be "name  start   end". A suggested approach for generated this file is to use “samtools faidx reference.fasta”, and then extracting the first and second column from the resulting .fai file (e.g. awk ‘{print $1, $2}’ reference.fasta.fai). Note that the scaffold name should only include that preceding the first whitespace " " delimiter. The order of scaffolds should match that in the reference used for mapping. If you have excluded any scaffolds from your `angsd` analysis, they should also be excluded from the .lengths file. 
+
+The default behaviour is that any empty scaffolds (where no reads were mapped/passed filters) are printed as an 'empty' scaffolds, made up of Ns. If you do not want this, you can use the `-no_empty_scaffold` flag which will result in no empty scaffolds in the fasta output.
+
+We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different parametrs such as min/max depth cut offs, the number of reads sampled, number of matches. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
 
 
 ## Computational requirements
