@@ -198,7 +198,7 @@ int main(int argc, char **argv){
     std::cout<<"-min minimum coverage for which positions should be called (defaults to 3)\n";
     std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
     std::cout<<"-n_matches number of matches required to call a position (defaults to 2)\n";
-    std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3)\n";
+    std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3) (use -1 to use all reads)\n";
     std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
     std::cout<<"-v if set, verbose output to stout\n";
     std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output\n";
@@ -251,7 +251,7 @@ int main(int argc, char **argv){
   }
   const std::string &n_random_reads_string = input.getCmdOption("-n_random_reads");
   if (!n_random_reads_string.empty()){
-    n_random_reads = stoi(n_random_reads_string);
+    n_random_reads = stoi(n_random_reads_string);  // "-1" will set n_random_reads = -1
   }
 
   const std::string &seed_string = input.getCmdOption("-seed");
@@ -413,9 +413,11 @@ int main(int argc, char **argv){
       }
       // sample random reads
       std::fill(sampled_reads.begin(), sampled_reads.end(), 0);
-      int n_random_reads_this_pos=n_random_reads;
-      if (n_random_reads>depth){
-        n_random_reads_this_pos=depth;
+      int n_random_reads_this_pos = n_random_reads;
+      if (n_random_reads == -1) {
+        n_random_reads_this_pos = depth;  // Use all available reads
+      } else if (n_random_reads > depth) {
+        n_random_reads_this_pos = depth;
       }
       for (int i=0;i<n_random_reads_this_pos;i++){
         int read_counter = 3;
