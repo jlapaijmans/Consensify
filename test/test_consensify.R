@@ -24,6 +24,7 @@ test_that("consensify files with all scaffolds present",{
   expect_true(length(test$scaffold1)==60)
   expect_true(length(test$scaffold2)==50)
   expect_true(test$scaffold1[1]=="n")
+  expect_true(all(test$scaffold1[4]=="g")) # has 4 G's so should be G
   expect_true(test$scaffold1[49]!="n")
   expect_true(all(test$scaffold1[50:51]=="n"))
   expect_true(all(test$scaffold1[52:55]=="n")) # not called as depth =2
