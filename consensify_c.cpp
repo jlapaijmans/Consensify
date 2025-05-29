@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : consensify_c.cpp
 // Author      : Andrea Manica, Johanna Paijmans, Axel Barlow
-// Version     : 2.4.0 (update version on line 188 of the code)
+// Version     : 2.4.1 (update version on line 188 of the code)
 // Copyright   : Your copyright notice
 // Description : A general, C-based implementation of the Consensify algorithm
 //============================================================================
@@ -17,6 +17,7 @@
 #include <memory>
 using namespace std;
 #include <zlib.h>
+#include <cmath> // *** NEW ***
 
 // from https://stackoverflow.com/questions/865668/parsing-command-line-arguments-in-c
 // this avoids non-standard dependencies, as we just need to parse a couple of simple arguments
@@ -177,7 +178,7 @@ int main(int argc, char **argv){
   // defaults values
   int min_depth = 3;
   int max_depth = 100;
-  int n_matches_to_call = 2;
+  float n_matches_to_call = 2;
   int n_random_reads = 3;
   bool verbose = false;
   bool empty_scaffold = true;
@@ -185,7 +186,7 @@ int main(int argc, char **argv){
   
   
   // parse options
-  cout << "consensify_c v2.4.0" << endl;
+  cout << "consensify_c v2.4.1" << endl;
   InputParser input(argc, argv);
   
   if(input.cmdOptionExists("-h")){
@@ -197,7 +198,7 @@ int main(int argc, char **argv){
     std::cout<<"-o filename(with path) of the output fasta (required\n";
     std::cout<<"-min minimum coverage for which positions should be called (defaults to 3)\n";
     std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
-    std::cout<<"-n_matches number of matches required to call a position (defaults to 2)\n";
+std::cout<<"-n_matches number of matching bases required to call a position; if <1, interpreted as fraction (e.g. 0.75 means >75% must agree) (defaults to 2))\n";
     std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3) (use -1 to use all reads)\n";
     std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
     std::cout<<"-v if set, verbose output to stout\n";
@@ -247,7 +248,7 @@ int main(int argc, char **argv){
   }
   const std::string &n_matches_string = input.getCmdOption("-n_matches");
   if (!n_matches_string.empty()){
-    n_matches_to_call = stoi(n_matches_string);
+    n_matches_to_call = stof(n_matches_string); // *** MODIFIED: use stof
   }
   const std::string &n_random_reads_string = input.getCmdOption("-n_random_reads");
   if (!n_random_reads_string.empty()){
@@ -404,18 +405,15 @@ int main(int argc, char **argv){
         
     // read in the counts for this position
     infile_counts->read(line_counts);
-    // if the depth is below the minimum depth, then set this as missing value
     if ((depth>=min_depth) & (depth<=max_depth)){
-      // sample randomly
       split_4int(line_counts, '\t', counts);
       if (verbose) {
         std::cout<<"counts\tA "<<counts[0]<<"\tC "<<counts[1]<<"\tG "<<counts[2]<<"\tT "<<counts[3]<<std::endl;
       }
-      // sample random reads
       std::fill(sampled_reads.begin(), sampled_reads.end(), 0);
       int n_random_reads_this_pos = n_random_reads;
       if (n_random_reads == -1) {
-        n_random_reads_this_pos = depth;  // Use all available reads
+        n_random_reads_this_pos = depth;
       } else if (n_random_reads > depth) {
         n_random_reads_this_pos = depth;
       }
@@ -427,39 +425,54 @@ int main(int argc, char **argv){
           random_index -= counts[read_counter];
           --read_counter;
         }
-        // update counts
         counts[read_counter]--;
         sampled_reads[read_counter]++;
       }
       if (verbose) {
         std::cout<<"sampled\tA "<<sampled_reads[0]<<"\tC "<<sampled_reads[1]<<"\tG "<<sampled_reads[2]<<"\tT "<<sampled_reads[3]<<std::endl;
-        
       }
-      // now check if we have a majority
-      for (int i=0;i<5;i++){
-        if (i==4){
-          outfile_fasta<<"N";
-          if (verbose){
-            std::cout<<"There is no majority, set as N\n";
+
+      // consensus
+      bool consensus_found = false;
+      if (n_matches_to_call < 1.0) {
+        int total_reads = n_random_reads_this_pos;
+        float fraction = n_matches_to_call;
+        for (int i = 0; i < 4; ++i) {
+          if (total_reads > 0 && (float)sampled_reads[i] / total_reads > fraction) {
+            outfile_fasta << int_to_base[i];
+            consensus_found = true;
+            if (verbose) {
+              std::cout << "Consensus is " << int_to_base[i] << " (fraction " << (float)sampled_reads[i] / total_reads << ")\n";
+            }
+            break;
           }
-          break;
         }
-        if (sampled_reads[i]>n_matches_to_call-1) {
-          //outfile_fasta<<convert_int_to_base(i);
-          outfile_fasta<<int_to_base[i];
-          if (verbose){
-            std::cout<<"Consensus is "<<int_to_base[i]<<"\n";
+      } else {
+        for (int i = 0; i < 4; ++i) {
+          if (sampled_reads[i] > n_matches_to_call - 1) {
+            outfile_fasta << int_to_base[i];
+            consensus_found = true;
+            if (verbose) {
+              std::cout << "Consensus is " << int_to_base[i] << "\n";
+            }
+            break;
           }
-          break;
         }
       }
-    } else { // set this as missing
+      if (!consensus_found) {
+        outfile_fasta << "N";
+        if (verbose) {
+          std::cout << "There is no consensus, set as N\n";
+        }
+      }
+    } else {
       if (verbose){
         std::cout<<"Below minimum depth, set to N\n";
       }
       outfile_fasta<<"N";
     }
-  }
+  }   // <--- ADD THIS: closes the while (infile_pos->read(line_pos)) loop
+
   // check that on the very last scaffold, we don't have some missing values at the end
   if (position<end){
     for (int i=0;i<(end-position);i++){
