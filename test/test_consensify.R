@@ -77,7 +77,7 @@ test_that("consensify files with missing scaffolds",{
 })
 
 
-# test for missing scaffolds at beginning middle and end, without filling
+# test for missing scaffolds at beginning middle and end, without filling+
 test_that("consensify files with missing scaffolds, leaving them empty",{
   res <- system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta -no_empty_scaffold",
           stdout = TRUE)
@@ -89,9 +89,26 @@ expect_true(length(test$scaffold2)==50)
 file.remove("./test.fasta")
 })
 
+# test for proportional reads
+test_that("consensify files with proportional read calling (all reads sampled)",{
+  res <- system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta -n_random_reads -1 -n_matches 0.75",
+                 stdout = TRUE)
+  test <- ape::read.FASTA("./test.fasta")
+  test <- as.character(test) ## cast it to character for easier testing
+  expect_true(all(test$scaffold1[2]=="n")) # has 2 G and 2 T so should be N 
+  expect_true(all(test$scaffold1[3]=="n")) # has 3 T and 1 A so should be N
+  expect_true(all(test$scaffold1[4]=="g")) # has 4 G so should be G
+  res <- system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta -n_random_reads -1 -n_matches 0.5",
+                 stdout = TRUE)
+  test <- ape::read.FASTA("./test.fasta")
+  test <- as.character(test) ## cast it to character for easier testing
+  expect_true(all(test$scaffold1[3]=="t")) # has 3 T and 1 A so should now be T
+  file.remove("./test.fasta")
+})
+
 
 #test we raise an error
 test_that("catch incorrect option",{
-  err_code <- system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta -wrong_option")
+  err_code <- system2("../consensify_c"," -c eg_missingness.counts.gz -p eg_missingness.pos.gz -s scaffold_lengths_missing_scaffold.txt -o test.fasta -wrong_option")
   expect_true(err_code==1)
 })
