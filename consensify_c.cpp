@@ -17,7 +17,6 @@
 #include <memory>
 using namespace std;
 #include <zlib.h>
-#include <cmath> // *** NEW ***
 
 // from https://stackoverflow.com/questions/865668/parsing-command-line-arguments-in-c
 // this avoids non-standard dependencies, as we just need to parse a couple of simple arguments
@@ -201,7 +200,7 @@ int main(int argc, char **argv){
 std::cout<<"-n_matches number of matching bases required to call a position; if <1, interpreted as fraction (e.g. 0.75 means >75% must agree) (defaults to 2))\n";
     std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3) (use -1 to use all reads)\n";
     std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
-    std::cout<<"-v if set, verbose output to stout\n";
+    std::cout<<"-v if set, verbose output to stdout\n";
     std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output\n";
     std::cout<<"-h a list of available options (note that other options will be ignored)\n";
     std::cout<<"\n";
@@ -471,7 +470,7 @@ std::cout<<"-n_matches number of matching bases required to call a position; if 
       }
       outfile_fasta<<"N";
     }
-  }   // <--- ADD THIS: closes the while (infile_pos->read(line_pos)) loop
+  }   // closes the while (infile_pos->read(line_pos)) loop
 
   // check that on the very last scaffold, we don't have some missing values at the end
   if (position<end){

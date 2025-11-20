@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "allreads_proportional_JP" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "allreads_proportional_JP" ]
+    branches: [ "main" ]
 
 jobs:
   build:

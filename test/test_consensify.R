@@ -78,7 +78,7 @@ test_that("consensify files with missing scaffolds",{
 })
 
 
-# test for missing scaffolds at beginning middle and end, without filling+
+# test for missing scaffolds at beginning middle and end, without filling
 test_that("consensify files with missing scaffolds, leaving them empty",{
   res <- system2("../consensify_c"," -c eg_missingness.counts -p eg_missingness.pos -s scaffold_lengths_missing_scaffold.txt -o test.fasta -no_empty_scaffold",
           stdout = TRUE)
@@ -110,6 +110,8 @@ test_that("consensify files with proportional read calling (all reads sampled)",
 
 #test we raise an error
 test_that("catch incorrect option",{
-  err_code <- system2("../consensify_c"," -c eg_missingness.counts.gz -p eg_missingness.pos.gz -s scaffold_lengths_missing_scaffold.txt -o test.fasta -wrong_option")
+  err_code <- system2("../consensify_c",
+                      " -c eg_missingness.counts.gz -p eg_missingness.pos.gz -s scaffold_lengths_missing_scaffold.txt -o test.fasta -wrong_option",
+                      stderr = FALSE, stdout = FALSE)
   expect_true(err_code==1)
 })
