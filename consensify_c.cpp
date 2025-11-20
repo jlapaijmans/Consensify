@@ -197,7 +197,7 @@ int main(int argc, char **argv){
     std::cout<<"-o filename(with path) of the output fasta (required\n";
     std::cout<<"-min minimum coverage for which positions should be called (defaults to 3)\n";
     std::cout<<"-max maximum coverage for which positions should be called (defaults to 100)\n";
-std::cout<<"-n_matches number of matching bases required to call a position; if <1, interpreted as fraction (e.g. 0.75 means >75% must agree) (defaults to 2))\n";
+    std::cout<<"-n_matches number of matching bases required to call a position; if <1, interpreted as fraction (e.g. 0.75 means >75% must agree) (defaults to 2)\n";
     std::cout<<"-n_random_reads number of random reads used; note that fewer reads might be used if a position has depth<n_random_reads (defaults to 3) (use -1 to use all reads)\n";
     std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
     std::cout<<"-v if set, verbose output to stdout\n";
@@ -247,7 +247,7 @@ std::cout<<"-n_matches number of matching bases required to call a position; if 
   }
   const std::string &n_matches_string = input.getCmdOption("-n_matches");
   if (!n_matches_string.empty()){
-    n_matches_to_call = stof(n_matches_string); // *** MODIFIED: use stof
+    n_matches_to_call = stof(n_matches_string);
   }
   const std::string &n_random_reads_string = input.getCmdOption("-n_random_reads");
   if (!n_random_reads_string.empty()){
@@ -448,7 +448,7 @@ std::cout<<"-n_matches number of matching bases required to call a position; if 
         }
       } else {
         for (int i = 0; i < 4; ++i) {
-          if (sampled_reads[i] > n_matches_to_call - 1) {
+          if (sampled_reads[i] > (int)n_matches_to_call - 1) {
             outfile_fasta << int_to_base[i];
             consensus_found = true;
             if (verbose) {
