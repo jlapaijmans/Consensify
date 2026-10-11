@@ -1,2 +1,0 @@
-name	start	end
-scaffold1	1	60
