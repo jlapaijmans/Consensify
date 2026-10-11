@@ -18,18 +18,20 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
 ### Version 2
 
-#### consensify_c v2.4.0
+#### consensify_c v2.4.1
+Sample all reads with `-n_random_reads` set to -1
+Allow the use of a float to give the proportion of matches that allow a base call for `-n_matches`
 
+
+#### consensify_c v2.4.0
 First official release of `consensify_c`. 
 Also, `consensify_c` is now also available to install using conda: 
 https://bioconda.github.io/recipes/consensify/README.html
 
 #### consensify_c v2.3.9001
-
 `consensify_c` can now take compressed .pos and .counts input files directly from `angsd`
 
 #### consensify_c v2
-
 Andrea Manica recoded consensify in C++, and also expanded the custom input options. In addition to `-min` minimum covierage and `-max` maximum coverage, we now also have `-n_matches` specifying how many bases need to match for acccepting abase and `-n_random_reads` the number of reads are randomly sampled from the read stack. The manual below is updated to reflect the new version.
 
 ## Introduction
