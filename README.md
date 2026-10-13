@@ -124,6 +124,7 @@ Available options:
 -seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)
 -v if set, verbose output to stout
 -no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output
+-rename_scaffold name for the output scaffold (only valid if the scaffold file contains a single scaffold, e.g. a mitogenome)
 -h a list of available options (note that other options will be ignored)
 
 example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta
@@ -163,6 +164,8 @@ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 The .lengths file for `consensify_c` has to be created by the user. See the example scaffold_lengths.txt in the example directory. It's a 3-column tab delimited text file containing scaffold names, and their start and end position. The column headers have to be "name  start   end". A suggested approach for generated this file is to use “samtools faidx reference.fasta”, and then extracting the first and second column from the resulting .fai file (e.g. awk ‘{print $1, $2}’ reference.fasta.fai). Note that the scaffold name should only include that preceding the first whitespace " " delimiter. The order of scaffolds should match that in the reference used for mapping. If you have excluded any scaffolds from your `angsd` analysis, they should also be excluded from the .lengths file. 
 
 The default behaviour is that any empty scaffolds (where no reads were mapped/passed filters) are printed as an 'empty' scaffolds, made up of Ns. If you do not want this, you can use the `-no_empty_scaffold` flag which will result in no empty scaffolds in the fasta output.
+
+By default, each sequence in the fasta output is named after its scaffold in the reference. When working on a single scaffold (e.g. a mitogenome), it is often more useful to name the output sequence after the sample; this can be done with `-rename_scaffold name_of_sample`. This option can only be used if the scaffold file contains a single scaffold, otherwise consensify exits with an error.
 
 We strongly recommend that you carefully examine this example file alongside the input eg.counts file to understand the behaviour of the method. You may also wish to test different parametrs such as min/max depth cut offs, the number of reads sampled, number of matches. It is also useful to replicate analyses to see variability in the finished sequence due to random base sampling.
 

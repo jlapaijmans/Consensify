@@ -56,9 +56,9 @@ return true;}
 private:
   std::vector <std::string> tokens;
   // set of valid options
-  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-v","-no_empty_scaffold","-h","-seed"};
+  const std::vector <std::string> validOptions{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-v","-no_empty_scaffold","-h","-seed","-rename_scaffold"};
   // set of options that take an additional argument
-  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-seed"};
+  const std::vector <std::string> validOptionsWithArgument{"-p","-c","-s","-o","-min","-max","-n_matches","-n_random_reads","-seed","-rename_scaffold"};
 };
 
 // custom splitter for a file with one char field followed by 2 integer fields (as used in the position and scaffold file
@@ -202,6 +202,7 @@ int main(int argc, char **argv){
     std::cout<<"-seed seed for the random number generator (if not set, random device is used to initialise the Marsenne-Twister)\n";
     std::cout<<"-v if set, verbose output to stdout\n";
     std::cout<<"-no_empty_scaffold if set, empty scaffolds in the counts file are NOT printed in the fasta output\n";
+    std::cout<<"-rename_scaffold name for the output scaffold (only valid if the scaffold file contains a single scaffold, e.g. a mitogenome)\n";
     std::cout<<"-h a list of available options (note that other options will be ignored)\n";
     std::cout<<"\n";
     std::cout<<"example usage: consensify_c -c eg.counts -p eg.pos -o eg.fasta\n";
@@ -264,6 +265,15 @@ int main(int argc, char **argv){
   if(input.cmdOptionExists("-no_empty_scaffold")){
     empty_scaffold = false;
   }
+  const std::string &rename_scaffold = input.getCmdOption("-rename_scaffold");
+  if (input.cmdOptionExists("-rename_scaffold") && rename_scaffold.empty()){
+    std::cout<<"a name should be given with option -rename_scaffold"<<std::endl;
+    exit(1);
+  }
+  // name to be used in the fasta output for a given scaffold
+  auto out_name = [&rename_scaffold](const std::string &name) -> const std::string& {
+    return rename_scaffold.empty() ? name : rename_scaffold;
+  };
   
   // dictionary vector
   vector<string> int_to_base{"A","C","G","T"};
@@ -285,6 +295,23 @@ int main(int argc, char **argv){
 
   // ifstream for scaffolds
   std::ifstream infile_scaffolds (filename_scaffolds);
+  
+  // renaming is only allowed if the scaffold file contains a single scaffold
+  if (!rename_scaffold.empty()){
+    std::ifstream infile_scaffolds_check (filename_scaffolds);
+    std::string line_check;
+    int n_scaffolds = 0;
+    std::getline(infile_scaffolds_check, line_check); // skip the header
+    while (std::getline(infile_scaffolds_check, line_check)){
+      if (!trim(line_check).empty()){
+        n_scaffolds++;
+      }
+    }
+    if (n_scaffolds != 1){
+      std::cout<<"ERROR: -rename_scaffold can only be used when the scaffold file contains a single scaffold (found "<<n_scaffolds<<")\n";
+      exit(1);
+    }
+  }
   
   // ofstream to store info
   std::ofstream outfile_fasta (filename_out);
@@ -370,7 +397,7 @@ int main(int argc, char **argv){
           std::cout<<"we failed to find "<<chr_name<<" as read in the positions file\n";
           exit(1);
         } else if (empty_scaffold){ //else we fill the contig with N if requested
-          outfile_fasta<<">"<<chr_name_ref<<std::endl;
+          outfile_fasta<<">"<<out_name(chr_name_ref)<<std::endl;
           for (int i=start;i<end+1;i++){
             outfile_fasta<<"N";
           }
@@ -379,7 +406,7 @@ int main(int argc, char **argv){
       }
       // if we have found the correct scaffold
       if (chr_name==chr_name_ref) {
-        outfile_fasta<<">"<<chr_name<<std::endl;
+        outfile_fasta<<">"<<out_name(chr_name)<<std::endl;
         if (position>start){ // if we have a new scaffold, but the first position in the pos file is not the same as the start of the scaffold, add some Ns
           for (int i=0;i<position-start;i++){
             outfile_fasta<<"N";
@@ -487,7 +514,7 @@ int main(int argc, char **argv){
       }
       split_1char_2int(line_scaffolds, '\t', chr_name_ref, start, end);      
 
-    outfile_fasta<<"\n>"<<chr_name_ref<<std::endl;
+    outfile_fasta<<"\n>"<<out_name(chr_name_ref)<<std::endl;
     if (position>start){
       for (int i=0;i<position-start;i++){
         outfile_fasta<<"N";
