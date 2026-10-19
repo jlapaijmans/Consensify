@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : consensify_c.cpp
 // Author      : Andrea Manica, Johanna Paijmans, Axel Barlow
-// Version     : 2.4.1 (update version on line 188 of the code)
+// Version     : 2.4.2 (update version on line 188 of the code)
 // Copyright   : Your copyright notice
 // Description : A general, C-based implementation of the Consensify algorithm
 //============================================================================
@@ -185,7 +185,7 @@ int main(int argc, char **argv){
   
   
   // parse options
-  cout << "consensify_c v2.4.1" << endl;
+  cout << "consensify_c v2.4.2" << endl;
   InputParser input(argc, argv);
   
   if(input.cmdOptionExists("-h")){
