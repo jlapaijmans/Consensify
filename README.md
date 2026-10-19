@@ -18,6 +18,9 @@ emails: axel.barlow.ab@gmail.com, paijmans.jla@gmail.com
 
 ### Version 2
 
+#### consensify_c v2.4.2
+Add `-rename_scaffold` option for single-scaffold (e.g. mitogenome) output
+
 #### consensify_c v2.4.1
 Sample all reads with `-n_random_reads` set to -1
 Allow the use of a float to give the proportion of matches that allow a base call for `-n_matches`
